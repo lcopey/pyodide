@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+    </head>
+    <body>
+        <p id="title">My first pyodide app</p>
+        <script>
+            function convert(arg) {
+                return arg.toJs({dict_converter: Object.fromEntries});
+            }
+
+            var products = [{
+                id: 1,
+                name: "product 1",
+                price: 100,
+            }, {
+                id: 2,
+                name: "product 2",
+                price: 300,
+            }];
+
+
+            async function main() {
+                let pyodide = await loadPyodide();
+
+                pyodide.runPython(`
+                print('Hello world, from the browser !')
+                
+                import js
+                js.document.title = "Hello from python"
+
+                js.document.getElementById("title").innerText = "Replaced by Python"
+                `);
+
+                pyodide.runPython(`
+                import js
+
+                products = js.products.to_py()
+                products.append({
+                    "id": 3,
+                    "name": "Product 3",
+                    "price": 400
+                })
+
+                print(js.products, type(js.products))
+                print(products)
+                `)
+
+                let products = convert(pyodide.globals.get("products"));
+                console.log(products);
+            };
+
+            main();
+        </script>
+    </body>
+</html>

@@ -2,32 +2,29 @@
 <html>
     <head>
         <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body>
-        <p id="title">My first pyodide app</p>
+
+    <body class="bg-slate-900">
+        <div id="app" class="relative h-full max-w-7xl mx-auto my-16"></div>
         <script>
-            var name = "Joh  Doe"
-            async function main() {
-                let pyodide = await loadPyodide();
+            class App {
+                state = {
+                    titles: [],
+                };
 
-                pyodide.runPython(`
-                print('Hello world, from the browser !')
-                
-                import js
-                js.document.title = "Hello from python"
+                view() {
+                    return `<p class='text-slate-100'>Hello, world</p>`
+                }
 
-                js.document.getElementById("title").innerText = "Replaced by Python"
-                `);
+                render() {
+                    app.innerHTML = this.view();
+                }
+            }
 
-                pyodide.runPython(`
-                import js
-                
-                name = js.name
-                print(name, type(name))
-                `)
-            };
+            var appComponent = new App();
+            appComponent.render();
 
-            main();
         </script>
     </body>
 </html>
