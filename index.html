@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+    </head>
+    <body>
+        <p id="title">My first pyodide app</p>
+        <script>
+            var name = "Joh  Doe"
+            async function main() {
+                let pyodide = await loadPyodide();
+
+                pyodide.runPython(`
+                print('Hello world, from the browser !')
+                
+                import js
+                js.document.title = "Hello from python"
+
+                js.document.getElementById("title").innerText = "Replaced by Python"
+                `);
+
+                pyodide.runPython(`
+                import js
+                
+                name = js.name
+                print(name, type(name))
+                `)
+            };
+
+            main();
+        </script>
+    </body>
+</html>
