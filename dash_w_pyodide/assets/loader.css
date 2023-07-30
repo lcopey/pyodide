@@ -9,6 +9,11 @@ lds-ring {
     width: 80px;
     height: 80px;
   }
+  .lds-ring p {
+    display: block;
+    position: absolute;
+    left: calc(var(--ring-size) + var(--ring-border) + 4px);
+  }
   .lds-ring div {
     box-sizing: border-box;
     display: block;
