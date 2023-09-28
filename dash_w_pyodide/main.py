@@ -18,7 +18,7 @@ TEMPLATE = read_template()
 app = Dash(__name__, index_string=TEMPLATE)
 app.layout = html.Div()
 
-DEBUG = False
+DEBUG = True
 
 if __name__ == '__main__':
     app.run(debug=DEBUG)

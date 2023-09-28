@@ -23,9 +23,9 @@ function add_status_div() {
 }
 
 async function initPyodide() {
-    // add_status_div();
-    // set_status_msg('Loading pyodide');
-    // let pyodide = await loadPyodide();
+    add_status_div();
+    set_status_msg('Loading pyodide');
+    let pyodide = await loadPyodide();
 
     // set_status_msg('Loading packages')
     // await pyodide.loadPackage(["pandas"]);
@@ -36,7 +36,7 @@ async function initPyodide() {
     // window.pyodide_ready = true;
     // set_status_msg('All done')
     // remove_status_div();
-    add_status_div();
-    set_status_msg('Loading pyodide');
+    // add_status_div();
+    // set_status_msg('Loading pyodide');
 }
 initPyodide();
