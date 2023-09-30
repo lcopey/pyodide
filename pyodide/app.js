@@ -8,19 +8,21 @@ class App {
         this.setLoadingStatus('Loading pyodide');
         this.pyodide = await loadPyodide();
 
-        this.setLoadingStatus('Loading pandas');
-        await this.pyodide.loadPackage("pandas");
+        // this.setLoadingStatus('Loading pandas');
+        // await this.pyodide.loadPackage("pandas");
 
         this.setLoadingStatus('Load custom python');
-        await this.pyodide.runPythonAsync(`
-        from pyodide.http import pyfetch
-        response = await pyfetch("main.py")
-        with open("main.py", "wb") as f:
-            f.write(await response.bytes())
-      `)
-
+    //     await this.pyodide.runPythonAsync(`
+    //     from pyodide.http import pyfetch
+    //     response = await pyfetch("main.py")
+    //     with open("main.py", "wb") as f:
+    //         f.write(await response.bytes())
+    //   `)
+        let response = await fetch('pkg.zip');
+        let buffer = await response.arrayBuffer();
+        await this.pyodide.unpackArchive(buffer, 'zip');
+        this.pkg = this.pyodide.pyimport('pkg');
         this.setLoadingStatus('Done');
-        this.pkg = this.pyodide.pyimport("main");
     }
 
     setLoadingStatus(value) {
@@ -31,14 +33,11 @@ class App {
     view() {
         const loading_div = (
             `<div id="message" class="container-fluid bg-primary">
-                <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                <span class="loader"></span>
                 <p class="text-center">${this.loadingStatus}</p>
-            </div>`);
-
-        const app_div = (`<div></div>`);
-
-        return this.loadingStatus === 'Done' ? app_div : loading_div;
-        // return loading_div;
+            </div>`
+        )
+        return this.loadingStatus === 'Done' ? this.pkg.render() : loading_div;
     }
 
     render() {
