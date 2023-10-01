@@ -6,7 +6,6 @@
     <title>{%title%}</title>
     {%favicon%}
     {%css%}
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js"></script>
 </head>
 
 <body>
@@ -15,6 +14,7 @@
             alert("Dash v2.7+ does not support Internet Explorer. Please use a newer browser.");
         </script>
     <![endif]-->
+    <div id="pyodide_status"></div>
     {%app_entry%}
     <footer>
         {%config%}
