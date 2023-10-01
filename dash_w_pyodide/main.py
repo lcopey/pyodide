@@ -33,45 +33,37 @@ app.layout = html.Div(
 )
 
 
-def python_callback(*args):
+def clientside_python_callback(*args):
     def wrapper(func):
         function_code = inspect.getsource(func)
         match = re.match(r'(?:@.*\(.*?\)\n)(def.*)',
                          function_code, flags=re.DOTALL)
         function_code = f'`{match.group(1)}`'
+        function_name = f"'{func.__name__}'"
         js_code = f"""function(...args){{
-            console.log('python_callback');
+            console.log('In python_callback');
+            console.log(args);
+            console.log("Results in python callback before :", results);
             worker.postMessage(
                 {{
                     type: 'code',
                     code: {function_code},
-                    function_name: '{func.__name__}',
+                    function_name: {function_name},
                     args: args
                 }});
+
+            console.log("Results in python callback after :", results);
+            if ({function_name} in results){{ 
+                const result = results[{function_name}];
+                return result;
+            }}
         }}"""
         clientside_callback(js_code, *args)
 
         return func
     return wrapper
 
-# clientside_callback(
-#     """
-#     function(n_clicks, label) {
-#         if (n_clicks) {
-#             const newLabel = Number(label) + 1;
-#             worker.postMessage(newLabel);
-#             return newLabel;
-#         }
-#         return 0
-#     }
-#     """,
-#     Output(label, 'children'),
-#     Input(add_button, 'n_clicks'),
-#     State(label, 'children')
-# )
-
-
-@python_callback(
+@clientside_python_callback(
     Output(label, 'children'),
     Input(add_button, 'n_clicks'),
     State(label, 'children')
@@ -79,7 +71,7 @@ def python_callback(*args):
 def test_python_client_side(n_clicks, label):
     if n_clicks and label:
         return int(label) + 1
-    return 0
+    return 1
 
 
 DEBUG = True

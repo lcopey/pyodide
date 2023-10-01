@@ -34,7 +34,7 @@ if (typeof importScripts === 'function') {
       }
       if (self.pyodide && self.pkg) {
         const result = self.pkg[function_name](...event.data.args);
-        self.postMessage({ type: 'result', content: result });
+        self.postMessage({ type: 'result', function_name: function_name, content: result });
       }
     }
   }

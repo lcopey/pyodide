@@ -9,6 +9,7 @@ function getLoadingStatus(status) {
     }
 }
 
+let results = {};
 const worker = new Worker("./assets/pyodide.js");
 worker.onmessage = (event) => {
     if (event.data.type == 'loading') {
@@ -22,6 +23,6 @@ worker.onmessage = (event) => {
         }
     }
     else if (event.data.type == 'result') {
-        console.log(event.data.content);
+        results[event.data.function_name] = event.data.content;
     }
 };
