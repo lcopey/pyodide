@@ -8,14 +8,17 @@ function setLoadingStatus(content) {
 async function loadPyodideAndPackages() {
 	setLoadingStatus('Loading pyodide');
 	self.pyodide = await loadPyodide();
+
 	setLoadingStatus('Loading dependencies');
 	await self.pyodide.loadPackage(["pandas"]);
+
 	setLoadingStatus('Loading application');
 	// load application, probably in script.py
 	let response = await fetch('./script.py');
 	let code = await response.text();
 	self.pyodide.FS.writeFile('./script.py', code, { encoding: "utf-8" });
 	self.pkg = self.pyodide.pyimport('script');
+	
 	setLoadingStatus("done");
 }
 
@@ -27,6 +30,7 @@ self.onmessage = async (event) => {
 		await pyodideReadyPromise;
 		const { id, python, ...context } = event.data.content;
 		// The worker copies the context in its own "memory" (an object mapping name to values)
+		// why ???
 		for (const key of Object.keys(context)) {
 			self[key] = context[key];
 		}
@@ -36,6 +40,16 @@ self.onmessage = async (event) => {
 			let results = await self.pyodide.runPythonAsync(python);
 			self.postMessage({ type: 'code', content: { results, id } });
 
+		} catch (error) {
+			self.postMessage({ type: 'code', content: { error: error.message, id } });
+		}
+	}
+	else if (event.data.type === 'function') {
+		await pyodideReadyPromise;
+		const { id, function_name, ...context } = event.data.content;
+		try {
+			let results = self.pkg[function_name](...context)
+			self.postMessage({ type: 'code', content: { results, id } });
 		} catch (error) {
 			self.postMessage({ type: 'code', content: { error: error.message, id } });
 		}

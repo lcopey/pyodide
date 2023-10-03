@@ -1,4 +1,4 @@
-import { asyncRun as asyncRunScript } from "./pyodide_consumer.js";
+import { asyncRunFunction, asyncRunScript } from "./pyodide_consumer.js";
 
 const script = `
     import statistics
@@ -28,4 +28,17 @@ async function main() {
     }
 }
 
+async function main2() {
+    const { results, error } = await asyncRunFunction("test_python_client_side", [0, 1]);
+    if (results) {
+        console.log("pyodideWorker return results: ", results);
+    } else if (error) {
+        console.log("pyodideWorker error: ", error);
+    }
+    else {
+        console.log(results, error);
+    }
+}
+
 main();
+// main2();

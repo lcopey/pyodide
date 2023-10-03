@@ -54,5 +54,26 @@ const asyncRunScript = (() => {
 })();
 
 
+const asyncRunFunction = (() => {
+    let id = 0; // identify a Promise
+    return (function_name, context) => {
+        // the id could be generated more carefully
+        id = (id + 1) % Number.MAX_SAFE_INTEGER;
+        return new Promise((onSuccess) => {
+            callbacks[id] = onSuccess;
+            const message = {
+                type: 'function',
+                content: {
+                    ...context,
+                    function_name,
+                    id,
+                }
+            };
+            worker.postMessage(message);
+        });
+    };
+})();
 
-export { asyncRunScript as asyncRun };
+
+
+export { asyncRunScript, asyncRunFunction };
