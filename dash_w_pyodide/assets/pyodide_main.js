@@ -1,4 +1,4 @@
-import { asyncRun } from "./pyodide_consumer.js";
+import { asyncRun as asyncRunScript } from "./pyodide_consumer.js";
 
 function getLoadingStatus(status) {
     if (status !== 'done') {
@@ -18,15 +18,19 @@ const script = `
 
 const context = {
     A_rank: [0.8, 0.4, 1.2, 3.7, 2.6, 5.8],
-  };
+};
 
 async function main() {
+    console.log('main')
     try {
-        const { results, error } = await asyncRun(script, context);
+        const { results, error } = await asyncRunScript(script, context);
         if (results) {
             console.log("pyodideWorker return results: ", results);
         } else if (error) {
             console.log("pyodideWorker error: ", error);
+        }
+        else {
+            console.log(results, error);
         }
     } catch (e) {
         console.log(
