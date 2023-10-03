@@ -12,6 +12,10 @@ async function loadPyodideAndPackages() {
 	await self.pyodide.loadPackage(["pandas"]);
 	setLoadingStatus('Loading application');
 	// load application, probably in script.py
+	let response = await fetch('./script.py');
+	let code = await response.text();
+	self.pyodide.FS.writeFile('./script.py', code, { encoding: "utf-8" });
+	self.pkg = self.pyodide.pyimport('script');
 	setLoadingStatus("done");
 }
 

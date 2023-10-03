@@ -33,7 +33,7 @@ worker.onmessage = (event) => {
     }
 };
 
-const asyncRun = (() => {
+const asyncRunScript = (() => {
     let id = 0; // identify a Promise
     return (script, context) => {
         // the id could be generated more carefully
@@ -53,4 +53,6 @@ const asyncRun = (() => {
     };
 })();
 
-export { asyncRun };
+
+
+export { asyncRunScript as asyncRun };

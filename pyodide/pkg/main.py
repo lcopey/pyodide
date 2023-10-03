@@ -1,9 +1,10 @@
-from functools import partial
 import math
+from functools import partial
 
 import js
-import pyodide
 import js.MaterialUI as mui
+
+import pyodide
 
 # e = js.React.createElement
 
@@ -47,8 +48,8 @@ def pythonify(component):
     return partial(aux, component, None, None)
 
 
-div = pythonify('div')
-p = pythonify('p')
+div = pythonify("div")
+p = pythonify("p")
 Button = pythonify(mui.Button)
 
 
@@ -71,18 +72,18 @@ def App(props, children):
 
     return div(
         p(f"{n} choose {k} = {math.comb(n, k)}"),
-        Button('Increase n').update(
+        Button("Increase n").update(
             on_click=increase_n, variant="contained", color="secondary"
         ),
         Button(
             on_click=increase_k, variant="contained", disabled=disabled, color="primary"
-        ).update('Increase k'),
+        ).update("Increase k"),
     )
 
 
 def render():
     # Create a div to contain our component
-    dom_container = js.document.createElement('div')
+    dom_container = js.document.createElement("div")
     js.document.body.appendChild(dom_container)
 
     js.ReactDOM.render(App(), dom_container)

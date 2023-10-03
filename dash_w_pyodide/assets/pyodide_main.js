@@ -1,15 +1,5 @@
 import { asyncRun as asyncRunScript } from "./pyodide_consumer.js";
 
-function getLoadingStatus(status) {
-    if (status !== 'done') {
-        return (
-            `<div id="message" class="container-fluid">
-            <span class="loader"></span>
-            <p class="text-center">${status}</p>
-        </div>`
-        )
-    }
-}
 const script = `
     import statistics
     from js import A_rank
@@ -21,7 +11,6 @@ const context = {
 };
 
 async function main() {
-    console.log('main')
     try {
         const { results, error } = await asyncRunScript(script, context);
         if (results) {
