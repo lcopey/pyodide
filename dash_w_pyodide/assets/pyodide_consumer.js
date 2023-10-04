@@ -15,7 +15,8 @@ function getLoadingStatus(status) {
 const callbacks = { code: {}, function: {} }
 
 worker.onmessage = (event) => {
-    if (event.data.type == 'loading') {
+    const callback_type = event.data.type;
+    if (callback_type == 'loading') {
         let element = document.getElementById("pyodide_status");
         const value = getLoadingStatus(event.data.content);
         if (value) {
@@ -24,18 +25,17 @@ worker.onmessage = (event) => {
         else {
             element.remove();
         }
-    }
-    else if (event.data.type == 'code') {
+    } else if (['code', 'function'].includes(callback_type)) {
         const { id, ...data } = event.data.content;
-        const onSuccess = callbacks.code[id];
-        delete callbacks.code[id];
+        let onSuccess;
+        if (callback_type == 'code') {
+            onSuccess = callbacks.code[id];
+            delete callbacks.code[id];
+        } else {
+            onSuccess = callbacks.function[id];
+            delete callbacks.function[id];
+        }
         onSuccess(data);
-    }
-    else if (event.data.type == 'function') {
-        const { id, ...data } = event.data.content;
-        const onSuccess = callbacks.function[id];
-        delete callbacks.function[id];
-        onSuccess(data)
     }
 };
 

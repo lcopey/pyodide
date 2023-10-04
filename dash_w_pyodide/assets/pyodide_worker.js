@@ -25,12 +25,11 @@ let pyodideReadyPromise = loadPyodideAndPackages();
 
 self.onmessage = async (event) => {
 	const callback_type = event.data.type;
-	if (callback_type in ('code', 'function')) {
+	if (callback_type === 'code') {
 		// make sure loading is done
 		await pyodideReadyPromise;
 		const { id, python, ...context } = event.data.content;
 		// The worker copies the context in its own "memory" (an object mapping name to values)
-		// why ???
 		for (const key of Object.keys(context)) {
 			self[key] = context[key];
 		}
@@ -45,7 +44,6 @@ self.onmessage = async (event) => {
 		}
 	}
 	else if (callback_type === 'function') {
-		console.log('worker executing function')
 		await pyodideReadyPromise;
 		const { id, function_name, args } = event.data.content;
 		try {
