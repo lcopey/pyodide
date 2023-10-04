@@ -61,48 +61,42 @@ class PythonClientSideCallbacks(Dict[str, str], metaclass=SingletonMeta):
             f.write("\n")
 
 
-def clientside_python_callback(*args):
+def clientside_python_callback(*args, **kwargs):
     def wrapper(func):
         callbacks = PythonClientSideCallbacks()
         callbacks.register(func)
-        # function_name, function_code = register_callback(func)
-        # function_code = f'`{function_code}`'
-        # function_name = f"'{function_name}'"
-
-        # js_code = f"""function(...args){{
-        #     console.log('In python_callback');
-        #     console.log(args);
-        #     console.log("Results in python callback before :", results);
-        #     worker.postMessage(
-        #         {{
-        #             type: 'code',
-        #             code: {function_code},
-        #             function_name: {function_name},
-        #             args: args
-        #         }});
-
-        #     console.log("Results in python callback after :", results);
-        #     if ({function_name} in results){{
-        #         const result = results[{function_name}];
-        #         return result;
-        #     }}
-        # }}"""
-        # clientside_callback(js_code, *args)
+        js_code = f"""
+        async function(...args) {{
+            const result = await asyncRunFunction('{func.__name__}', args);
+            return result.results
+        }}"""
+        clientside_callback(js_code, *args, **kwargs)
 
         return func
     return wrapper
 
 
 @clientside_python_callback(
-    Output(label, 'children'),
+    Output(label, 'children', allow_duplicate=True),
     Input(add_button, 'n_clicks'),
+    State(label, 'children'),
+    prevent_initial_call='initial_duplicate',
+)
+def python_add(n_clicks, label):
+    if not n_clicks:
+        return 1
+    return int(label) + 1
+
+
+@clientside_python_callback(
+    Output(label, 'children'),
+    Input(substract_button, 'n_clicks'),
     State(label, 'children')
 )
-# @python_clientside_callbacks.register
-def test_python_client_side(n_clicks, label):
-    if n_clicks and label:
-        return int(label) + 1
-    return 1
+def python_substract(n_clicks, label):
+    if not n_clicks:
+        return 1
+    return int(label) - 1
 
 
 DEBUG = True

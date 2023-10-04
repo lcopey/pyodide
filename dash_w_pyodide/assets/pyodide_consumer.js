@@ -12,7 +12,7 @@ function getLoadingStatus(status) {
 }
 
 
-const callbacks = {};
+const callbacks = { code: {}, function: {} }
 
 worker.onmessage = (event) => {
     if (event.data.type == 'loading') {
@@ -27,24 +27,30 @@ worker.onmessage = (event) => {
     }
     else if (event.data.type == 'code') {
         const { id, ...data } = event.data.content;
-        const onSuccess = callbacks[id];
-        delete callbacks[id];
+        const onSuccess = callbacks.code[id];
+        delete callbacks.code[id];
         onSuccess(data);
+    }
+    else if (event.data.type == 'function') {
+        const { id, ...data } = event.data.content;
+        const onSuccess = callbacks.function[id];
+        delete callbacks.function[id];
+        onSuccess(data)
     }
 };
 
-const asyncRunScript = (() => {
+const asyncRunCode = (() => {
     let id = 0; // identify a Promise
-    return (script, context) => {
+    return (python, context) => {
         // the id could be generated more carefully
         id = (id + 1) % Number.MAX_SAFE_INTEGER;
         return new Promise((onSuccess) => {
-            callbacks[id] = onSuccess;
+            callbacks.code[id] = onSuccess;
             const message = {
                 type: 'code',
                 content: {
                     ...context,
-                    python: script,
+                    python: python,
                     id,
                 }
             };
@@ -60,13 +66,13 @@ const asyncRunFunction = (() => {
         // the id could be generated more carefully
         id = (id + 1) % Number.MAX_SAFE_INTEGER;
         return new Promise((onSuccess) => {
-            callbacks[id] = onSuccess;
+            callbacks.function[id] = onSuccess;
             const message = {
                 type: 'function',
                 content: {
-                    ...context,
-                    function_name,
-                    id,
+                    args: context,
+                    function_name: function_name,
+                    id: id,
                 }
             };
             worker.postMessage(message);
@@ -74,6 +80,3 @@ const asyncRunFunction = (() => {
     };
 })();
 
-
-
-export { asyncRunScript, asyncRunFunction };
