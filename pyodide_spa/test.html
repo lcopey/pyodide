@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+</head>
+
+<body>
+    <script>
+        async function main() {
+            let pyodide = await loadPyodide();
+            let pythonResult = await pyodide.runPythonAsync(
+                `[{'aze': 'foo'}, {'aze': 'bar'}]`
+                // `'result'`
+            )
+            let result;
+            if (pythonResult.toJs) {
+                result = pythonResult.toJs();
+                pythonResult.destroy();
+            } else {
+                result = pythonResult;
+            }
+            console.log(result);
+        }
+        main();
+    </script>
+</body>
+
+</html>
